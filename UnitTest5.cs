@@ -12,13 +12,13 @@ namespace _1
         public static uint ParseBinary(this string str)
         {
             var r=0u;
-            var m=new Regex("^0b((?:0|1){1,})$").Match(str);
+            var m=new Regex("^0b(?<bits>[01]+)$").Match(str);
             if (m.Groups.Count!=2)
             {
                 throw new FormatException("Data not binary - only 0 and 1, starting with 0b");
             }
 
-            foreach (var c in m.Groups[1].Captures[0].ToString())
+            foreach (var c in m.Groups["bits"].Captures[0].ToString())
             {
                 r<<=1;
                 r+=uint.Parse(c.ToString());
@@ -44,7 +44,10 @@ namespace _1
 
             public static uint Parse(string raw)
             {
-                var proc=$"0b{raw.Replace('R','1').Replace('L','0').Replace('B','1').Replace('F','0')}";
+                var proc=$"0b{raw}";
+                proc=Regex.Replace(proc,"[RB]","1");
+                proc=Regex.Replace(proc,"[LF]","0");
+                //var proc=$"0b{raw.Replace('R','1').Replace('L','0').Replace('B','1').Replace('F','0')}";
                 return proc.ParseBinary();
             }
 
